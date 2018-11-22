@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue_grey_50"
+    tools:context=".activities.ChatsActivity">
+
+    <LinearLayout
+        android:layout_above="@+id/newMessageRelativeLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                app:titleTextColor="@android:color/white"
+                app:contentInsetLeft="15dp"
+                app:contentInsetStart="15dp">
+
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:clipToPadding="false"
+            android:padding="@dimen/item_offset"
+            android:id="@+id/chatsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/newMessageRelativeLayout"
+        android:paddingBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/sendRelativeLayout"
+            android:layout_toLeftOf="@+id/sendRelativeLayout"
+            android:id="@+id/editCardView"
+            android:layout_margin="5dp"
+            app:cardElevation="0dp"
+            app:cardCornerRadius="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:background="@android:color/white"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:textSize="14sp"
+                android:textColor="@color/grey_700"
+                android:id="@+id/newMessageEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/sendRelativeLayout"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/background_round_accent"
+            android:layout_width="40dp"
+            android:layout_height="40dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_centerInParent="true"
+                android:background="@drawable/ic_send"
+                android:id="@+id/sendImageView"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

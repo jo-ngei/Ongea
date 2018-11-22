@@ -1,0 +1,45 @@
+{
+  "project_info": {
+    "project_number": "87178517949",
+    "firebase_url": "https://ongea-c08e4.firebaseio.com",
+    "project_id": "ongea-c08e4",
+    "storage_bucket": "ongea-c08e4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:87178517949:android:9dad77ec56a8309d",
+        "android_client_info": {
+          "package_name": "com.ongea"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "87178517949-ln4p23nujtskhio8cm7pu42qi06en2ap.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwrw2tk0Lg-hAxCbCVxmBQ3RGqX55TOEQ"
+        },
+        {
+          "current_key": "AIzaSyBwrw2tk0Lg-hAxCbCVxmBQ3RGqX55TOEQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
