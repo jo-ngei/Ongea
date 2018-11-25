@@ -46,9 +46,16 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         mFirebaseAuth = FirebaseAuth.getInstance();
         //initialize firebase references
         initFirebaseReferences()
+        // get intent extras
+        getIntents()
         // initialize click listeners
         setUserProfile()
 
+        sendMessageButton.setOnClickListener { this }
+
+    }
+
+    private fun getIntents(){
         if (intent.extras != null){
             mUid = intent.getStringExtra(USER_ID)
         }

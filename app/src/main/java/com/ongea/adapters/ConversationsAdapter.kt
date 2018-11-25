@@ -51,6 +51,7 @@ class ConversationsAdapter(
     }
 
     private fun initFirebaseReferences(){
+        mFirebaseAuth = FirebaseAuth.getInstance()
         usersReference = FirebaseFirestore.getInstance().collection(Constants.USERS)
         roomReferences = FirebaseFirestore.getInstance().collection(Constants.CHATS)
         randomReference = FirebaseDatabase.getInstance().getReference(Constants.CHATS)

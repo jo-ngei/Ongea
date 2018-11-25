@@ -7,13 +7,17 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import butterknife.ButterKnife
+import com.google.firebase.auth.FirebaseAuth
 import com.ongea.R
 import com.ongea.adapters.MainPagerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var firebaseAuth: FirebaseAuth
     lateinit var mainPagerAdapter: MainPagerAdapter
+    private var USER_ID = "user id"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         ButterKnife.bind(this)
         setSupportActionBar(toolbar)
 
+        firebaseAuth = FirebaseAuth.getInstance()
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager);
         viewPager.adapter = mainPagerAdapter
         tabs.setupWithViewPager(viewPager)
@@ -50,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         if (id == R.id.action_profile){
             val intent = Intent(this, ProfileActivity::class.java);
+            intent.putExtra(this.USER_ID, firebaseAuth.currentUser!!.uid)
             startActivity(intent)
         }
         return super.onOptionsItemSelected(item)

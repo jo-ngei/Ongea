@@ -4,6 +4,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -13,15 +16,17 @@ import com.ongea.R
 import com.ongea.adapters.ChatsAdapter
 import com.ongea.models.Message
 import com.ongea.models.Room
+import com.ongea.models.User
 import kotlinx.android.synthetic.main.activity_chats.*
 
 class ChatsActivity : AppCompatActivity() {
     private val TAG: String = ChatsActivity::class.java.simpleName
     // firestore references
-    private var messagesReference: CollectionReference? = null
-    private var roomReferences: CollectionReference? = null
-    private var randomReference: DatabaseReference? = null
-    private var firebaseAuth: FirebaseAuth? = null
+    private lateinit var messagesReference: CollectionReference
+    private lateinit var roomReferences: CollectionReference
+    private lateinit var randomReference: DatabaseReference
+    private lateinit var usersReference: CollectionReference
+    private lateinit var firebaseAuth: FirebaseAuth
     // firestore listener
     private var listenerRegistration: ListenerRegistration? = null
     //chats adapter
@@ -49,6 +54,8 @@ class ChatsActivity : AppCompatActivity() {
         initReferences()
         // get intents extras
         getIntents()
+        //set toolbar title
+        setUserProfile()
         // get the chat messages set the recycler view
         setRecyclerView()
         getChatMessages()
@@ -67,12 +74,13 @@ class ChatsActivity : AppCompatActivity() {
     fun initReferences() {
         // firebase auth
         firebaseAuth = FirebaseAuth.getInstance()
-        currentUser = firebaseAuth!!.currentUser!!.uid
+        currentUser = firebaseAuth.currentUser!!.uid
         // firestore
         messagesReference = FirebaseFirestore.getInstance().collection(Constants.CHATS);
         roomReferences = FirebaseFirestore.getInstance().collection(Constants.CHATS)
+        usersReference = FirebaseFirestore.getInstance().collection(Constants.USERS)
         //firebase real time
-        randomReference = FirebaseDatabase.getInstance().getReference("random");
+        randomReference = FirebaseDatabase.getInstance().getReference(Constants.CHATS);
 
     }
 
@@ -82,15 +90,31 @@ class ChatsActivity : AppCompatActivity() {
         }
     }
 
+    fun setUserProfile(){
+        usersReference.document(mUid)
+                .addSnapshotListener(EventListener { documentSnapshot, exception ->
+                    if (exception != null){
+                        Log.d(TAG, "listerner error")
+                        return@EventListener
+                    }
+
+                    if (documentSnapshot!!.exists()){
+                        var user = documentSnapshot.toObject(User::class.java)
+                        toolbar.title = user?.username
+
+                    }
+                })
+    }
+
     fun createNewMessage() {
         val newMessage = Message.createMessage()
         val newRoom = Room.createRoom()
 
-        val pushId: String = randomReference?.push().toString()
-        val conversationId: String = randomReference?.push().toString()
+        val pushId: String = randomReference.push().key.toString()
+        val conversationId: String = randomReference.push().key.toString()
         val time: String = System.currentTimeMillis().toString()
         val text: String = newMessageEditText.text.toString()
-        val fromUser: String = firebaseAuth?.currentUser!!.uid
+        val fromUser: String = firebaseAuth.currentUser!!.uid
         val toUser: String = mUid
 
 
@@ -111,19 +135,21 @@ class ChatsActivity : AppCompatActivity() {
         newRoom.messageId = pushId
         newRoom.conversationId = conversationId
 
-        messagesReference?.document(fromUser)
-                ?.collection(conversationId)?.document(pushId)
-        messagesReference?.document(toUser)
-                ?.collection(conversationId)?.document(pushId)
+        messagesReference.document(fromUser)
+                .collection(conversationId).document(pushId)
+        messagesReference.document(toUser)
+                .collection(conversationId).document(pushId)
 
-        roomReferences?.document(toUser)
-                ?.collection("conversations")?.document(fromUser)
-        roomReferences?.document(fromUser)
-                ?.collection("conversations")?.document(toUser)
+        roomReferences.document(toUser)
+                .collection("conversations").document(fromUser)
+        roomReferences.document(fromUser)
+                .collection("conversations").document(toUser)
+
+        newMessageEditText.setText("")
     }
 
     fun getChatMessages() {
-       listenerRegistration = messagesReference!!.document(currentUser).collection(mConversationId)
+       listenerRegistration = messagesReference.document(currentUser).collection(mConversationId)
                 .addSnapshotListener(EventListener { documentSnapshots, e ->
 
                     if (e != null){

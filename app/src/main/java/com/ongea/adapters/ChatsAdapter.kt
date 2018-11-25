@@ -16,11 +16,11 @@ import com.ongea.models.Message
 class ChatsAdapter(
         private val chats: MutableList<Message>,
         private val context: Context)
-    : RecyclerView.Adapter<ChatsAdapter.SentMessagesViewHolder>() {
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var messagesCollection: CollectionReference
-    private var sent: Int
-    private val received: Int
+    private var SENT: Int
+    private var RECEIVED: Int
     private var MESSAGE1D: String
     private var CONVERSATIONID: String
     private var showOnClick: Boolean
@@ -32,13 +32,13 @@ class ChatsAdapter(
         firebaseAuth = FirebaseAuth.getInstance()
         // initialize firestore references
         messagesCollection = FirebaseFirestore.getInstance().collection(Constants.CHATS)
-        // view types
-        sent = 0
-        received = 1
-        // intent extras
+              // intent extras
         MESSAGE1D = "message id"
         CONVERSATIONID = "room id"
         showOnClick = false
+
+        SENT = 0
+        RECEIVED = 1
 
     }
 
@@ -47,14 +47,30 @@ class ChatsAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
+        var message = chats.get(position)
+        var toUserId = message.to
+        var fromUserId = message.from
+
+        if (fromUserId.equals(firebaseAuth.currentUser?.uid)){
+            return SENT
+        }else{
+            return RECEIVED
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SentMessagesViewHolder {
-        val view = LayoutInflater.from(parent!!.context)
-                .inflate(R.layout.layout_message_sent_default, parent, false)
-
-        return SentMessagesViewHolder(view)
+        val view: View? = null
+        when(getItemViewType(viewType)){
+               SENT ->  {
+                   LayoutInflater.from(parent.context)
+                       .inflate(R.layout.layout_message_sent_default, parent, false)
+                   return SentMessagesViewHolder(view!!)
+               }else -> {
+                   LayoutInflater.from(parent.context)
+                            .inflate(R.layout.layout_message_sent_default, parent, false)
+                   return SentMessagesViewHolder(view!!)
+            }
+        }
 
     }
 
@@ -62,12 +78,29 @@ class ChatsAdapter(
         return chats.size
     }
 
-    override fun onBindViewHolder(holder: SentMessagesViewHolder, position: Int) {
-        val message: Message? = chats[position];
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+         when(holder.itemViewType){
+             SENT -> {
+                 populateSentText(SentMessagesViewHolder(holder.itemView), position)
+             }
+             RECEIVED -> {
+                 populateRecievedText(ReceivedMessagesViewHolder(holder.itemView), position)
+             }
+         }
+    }
 
+    private fun populateSentText(holder: SentMessagesViewHolder, position: Int){
+        val message: Message? = chats[position];
         val text: String? = message?.text
         holder.messageText.text = text
     }
+
+    private fun populateRecievedText(holder: ReceivedMessagesViewHolder, position: Int){
+        val message: Message? = chats[position];
+        val text: String? = message?.text
+        holder.messageText.text = text
+    }
+
 
     inner class SentMessagesViewHolder internal constructor(view: View)
         : RecyclerView.ViewHolder(view) {
@@ -81,6 +114,21 @@ class ChatsAdapter(
             messageStatus = view.findViewById(R.id.statusTextView)
             messageDate = view.findViewById(R.id.dateTextView)
         }
+    }
+
+    inner class ReceivedMessagesViewHolder internal constructor(view: View)
+        :RecyclerView.ViewHolder(view){
+
+        internal var messageText: TextView
+        internal var messageStatus: TextView
+        internal var messageDate: TextView
+
+        init {
+            messageText = view.findViewById(R.id.messageTextView)
+            messageStatus = view.findViewById(R.id.statusTextView)
+            messageDate = view.findViewById(R.id.dateTextView)
+        }
+
     }
 
 }
