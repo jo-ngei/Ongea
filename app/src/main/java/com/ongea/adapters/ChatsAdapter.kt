@@ -6,17 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.bumptech.glide.Glide.init
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.firestore.ObservableSnapshotArray
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ongea.Constants
 import com.ongea.R
 import com.ongea.models.Message
 
-class ChatsAdapter(
-        private val chats: MutableList<Message>,
-        private val context: Context)
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatsAdapter(private val context:
+    Context, private val options: FirestoreRecyclerOptions<Message>)
+    : FirestoreRecyclerAdapter<Message, RecyclerView.ViewHolder>(options) {
 
     private var messagesCollection: CollectionReference
     private var SENT: Int
@@ -26,13 +30,12 @@ class ChatsAdapter(
     private var showOnClick: Boolean
     private var firebaseAuth = FirebaseAuth.getInstance()
 
-
     init {
         // initialize firebase auth
         firebaseAuth = FirebaseAuth.getInstance()
         // initialize firestore references
         messagesCollection = FirebaseFirestore.getInstance().collection(Constants.CHATS)
-              // intent extras
+        // intent extras
         MESSAGE1D = "message id"
         CONVERSATIONID = "room id"
         showOnClick = false
@@ -42,12 +45,20 @@ class ChatsAdapter(
 
     }
 
-    override fun getItemId(position: Int): Long {
-        return super.getItemId(position)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: Message) {
+        when(holder.itemViewType){
+            SENT -> {
+                populateSentText(SentMessagesViewHolder(holder.itemView), position)
+            }
+            RECEIVED -> {
+                populateRecievedText(ReceivedMessagesViewHolder(holder.itemView), position)
+            }
+        }
     }
 
+
     override fun getItemViewType(position: Int): Int {
-        var message = chats.get(position)
+        var message = getSnapshot(position)
         var toUserId = message.to
         var fromUserId = message.from
 
@@ -75,28 +86,25 @@ class ChatsAdapter(
     }
 
     override fun getItemCount(): Int {
-        return chats.size
+        return snapshots.size
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-         when(holder.itemViewType){
-             SENT -> {
-                 populateSentText(SentMessagesViewHolder(holder.itemView), position)
-             }
-             RECEIVED -> {
-                 populateRecievedText(ReceivedMessagesViewHolder(holder.itemView), position)
-             }
-         }
+    override fun getSnapshots(): ObservableSnapshotArray<Message> {
+        return super.getSnapshots()
+    }
+
+    private fun getSnapshot(index: Int): Message {
+        return snapshots.get(index);
     }
 
     private fun populateSentText(holder: SentMessagesViewHolder, position: Int){
-        val message: Message? = chats[position];
+        val message: Message? = getSnapshot(position)
         val text: String? = message?.text
         holder.messageText.text = text
     }
 
     private fun populateRecievedText(holder: ReceivedMessagesViewHolder, position: Int){
-        val message: Message? = chats[position];
+        val message: Message? = getSnapshot(position)
         val text: String? = message?.text
         holder.messageText.text = text
     }

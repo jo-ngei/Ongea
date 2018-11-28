@@ -11,7 +11,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,6 @@ public class App extends Application {
 
     private static App mInstance;
     private static final String TAG = App.class.getSimpleName();
-    private FirebaseRemoteConfig firebaseRemoteConfig;
     private Context context;
 
     @Override
@@ -32,8 +30,6 @@ public class App extends Application {
                 .build();
         FirebaseFirestore.getInstance().setFirestoreSettings(settings);
         FirebaseFirestore.setLoggingEnabled(true);
-
-        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         mInstance = this;
 

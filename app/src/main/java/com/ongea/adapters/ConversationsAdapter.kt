@@ -101,14 +101,12 @@ class ConversationsAdapter(
         : RecyclerView.ViewHolder(view) {
 
         internal var conversationTextTextView: TextView
-        internal var converstaionStatusTextView: TextView
         internal var converstaionDateTextView: TextView
         internal var profileImageView: CircleImageView
         internal var usernameTextView: TextView
 
         init {
             conversationTextTextView = view.findViewById(R.id.messageTextView)
-            converstaionStatusTextView = view.findViewById(R.id.statusTextView)
             converstaionDateTextView = view.findViewById(R.id.dateTextView)
             profileImageView = view.findViewById(R.id.profileImageView)
             usernameTextView = view.findViewById(R.id.usernameTextView)

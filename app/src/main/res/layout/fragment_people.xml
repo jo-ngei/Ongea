@@ -4,15 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/blue_grey_50"
-    tools:context=".fragments.ConversationsFragment">
+    tools:context=".fragments.PeopleFragment">
 
     <android.support.v7.widget.RecyclerView
         android:overScrollMode="never"
         android:clipToPadding="false"
-        android:id="@+id/conversationsRecyclerView"
+        android:id="@+id/usersRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

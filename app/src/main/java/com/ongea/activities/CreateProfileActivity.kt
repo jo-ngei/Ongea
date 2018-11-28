@@ -172,17 +172,21 @@ class CreateProfileActivity : AppCompatActivity(), View.OnClickListener {
                 FirebaseAuth.getInstance().signOut()
                 resendLinkRelativeLayout.visibility = View.VISIBLE
             }else {
-                overridePendingTransition(0, 0)
-                finish()
-                overridePendingTransition(0,0)
-                startActivity(intent)
-                AlertDialog.Builder(this)
-                        .setMessage("Ongea could not send verification email, please confirm that you " +
-                                "entered the right email and check your internet connection")
-                        .setPositiveButton(android.R.string.ok, DialogInterface.OnClickListener { dialog, which ->  }
-                        ).setIcon(android.R.drawable.ic_dialog_alert).show()
+               refreshActivity()
             }
         }
+    }
+
+    fun refreshActivity(){
+        overridePendingTransition(0, 0)
+        finish()
+        overridePendingTransition(0,0)
+        startActivity(intent)
+        AlertDialog.Builder(this)
+                .setMessage("Ongea could not send verification email, please confirm that you " +
+                        "entered the right email and check your internet connection")
+                .setPositiveButton(android.R.string.ok, DialogInterface.OnClickListener { dialog, which ->  }
+                ).setIcon(android.R.drawable.ic_dialog_alert).show()
     }
 
     fun createUserPtrofile(email: String, password: String) {
@@ -270,26 +274,22 @@ class CreateProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         if (id == R.id.submitUserInfoButton) {
-            if (firebaseAuth?.currentUser!!.uid != null){
-                checkIfEmailIsVerified(email, password)
-            }else{
-                progressDialog.setMessage("please wait...")
-                usersReference!!.whereEqualTo("username", usernameEditText.text.toString())
-                        .addSnapshotListener(EventListener { documentSnapshots, e ->
+            progressDialog.setMessage("please wait...")
+            usersReference!!.whereEqualTo("username", usernameEditText.text.toString())
+                    .addSnapshotListener(EventListener { documentSnapshots, e ->
 
-                            if (e != null){
-                                Log.e(TAG, "Listen failed", e)
-                                return@EventListener
+                        if (e != null){
+                            Log.e(TAG, "Listen failed", e)
+                            return@EventListener
 
-                            }
+                        }
 
-                            if (!documentSnapshots!!.isEmpty) {
-                                shortToast("username has been taken")
-                            }else {
-                                logingWithPassword()
-                            }
-                        })
-            }
+                        if (!documentSnapshots!!.isEmpty) {
+                            shortToast("username has been taken")
+                        }else {
+                            logingWithPassword()
+                        }
+                    })
         }
 
         if (v == resendLinkRelativeLayout) {
@@ -299,7 +299,6 @@ class CreateProfileActivity : AppCompatActivity(), View.OnClickListener {
 
                         if (it.isSuccessful){
                             sendVerificationEmail()
-                            shortToast("Please confirm your this " + email + " we have sent you a confirmation link")
                         }else {
                             errorRelativeLayout.visibility = View.VISIBLE
                             errorTextView.text = "Please check that you are connected to the internet"

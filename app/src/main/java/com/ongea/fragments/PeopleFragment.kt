@@ -1,19 +1,32 @@
-package com.ongea.activities
+package com.ongea.fragments
 
-import android.support.v7.app.AppCompatActivity
+
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.ongea.Constants
+
 import com.ongea.R
 import com.ongea.adapters.PeopleAdapdter
-import kotlinx.android.synthetic.main.activity_people.*
+import kotlinx.android.synthetic.main.fragment_people.*
 
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
-class PeopleActivity : AppCompatActivity() {
-    private var TAG = PeopleActivity::class.java.simpleName
+/**
+ * A simple [Fragment] subclass.
+ *
+ */
+class PeopleFragment : Fragment() {
+    private var TAG = PeopleFragment::class.java.simpleName
     //firebase reference
     private var usersCollection: CollectionReference? = null
     private var roomsQuery: Query? = null
@@ -28,17 +41,17 @@ class PeopleActivity : AppCompatActivity() {
     lateinit var mPeopleAdapter: PeopleAdapdter
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_people)
-        setSupportActionBar(toolbar)
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_whit)
-        toolbar.setNavigationOnClickListener { finish() }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        var view = inflater.inflate(R.layout.fragment_people, container, false)
         // initialize firebase auth and current user
         firebaseAuth = FirebaseAuth.getInstance()
         //initialize firestore references
         initReferences()
+        return  view
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -59,8 +72,8 @@ class PeopleActivity : AppCompatActivity() {
     }
 
     fun setRecyclerView() {
-        mPeopleAdapter = PeopleAdapdter(this, users)
-        mLinearLayoutManager = LinearLayoutManager(this)
+        mPeopleAdapter = PeopleAdapdter(context!!, users)
+        mLinearLayoutManager = LinearLayoutManager(context)
         usersRecyclerView.layoutManager = mLinearLayoutManager
         usersRecyclerView.adapter = mPeopleAdapter
     }
@@ -118,4 +131,5 @@ class PeopleActivity : AppCompatActivity() {
         mPeopleAdapter.notifyItemRemoved(change.oldIndex)
         mPeopleAdapter.notifyItemRangeChanged(0, users.size)
     }
+
 }

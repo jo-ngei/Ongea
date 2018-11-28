@@ -3,10 +3,12 @@ package com.ongea.adapters
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.app.FragmentStatePagerAdapter
 import com.ongea.fragments.ConversationsFragment
-import com.ongea.fragments.StoriesFragment
+import com.ongea.fragments.PeopleFragment
+import com.ongea.fragments.ProfileFragment
 
-class MainPagerAdapter: FragmentPagerAdapter {
+class MainPagerAdapter: FragmentStatePagerAdapter {
 
     constructor(fm: FragmentManager?) : super(fm)
 
@@ -14,8 +16,10 @@ class MainPagerAdapter: FragmentPagerAdapter {
         return when(position){
             0 -> {
                 ConversationsFragment()
+            } 1 ->{
+                PeopleFragment()
             }else -> {
-                StoriesFragment()
+                ProfileFragment()
             }
 
         }
@@ -23,16 +27,7 @@ class MainPagerAdapter: FragmentPagerAdapter {
     }
 
     override fun getCount(): Int {
-        return 2
+        return 3
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
-        return when(position){
-            0 -> {
-                "Chats"
-            }else -> {
-                "Stories"
-            }
-        }
-    }
 }

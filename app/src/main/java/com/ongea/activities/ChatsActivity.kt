@@ -3,10 +3,15 @@ package com.ongea.activities
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -31,8 +36,6 @@ class ChatsActivity : AppCompatActivity() {
     private var listenerRegistration: ListenerRegistration? = null
     //chats adapter
     lateinit var mChatsAdapter: ChatsAdapter
-    // firebase current user
-    lateinit var currentUser: String
     // intent string
     lateinit var mUid: String
     lateinit var mConversationId: String
@@ -56,11 +59,11 @@ class ChatsActivity : AppCompatActivity() {
         getIntents()
         //set toolbar title
         setUserProfile()
-        // get the chat messages set the recycler view
-        setRecyclerView()
         getChatMessages()
         // send message on clik
         sendMessage()
+        // set the adapter
+        setUpAdapter()
     }
 
     fun getIntents() {
@@ -74,13 +77,12 @@ class ChatsActivity : AppCompatActivity() {
     fun initReferences() {
         // firebase auth
         firebaseAuth = FirebaseAuth.getInstance()
-        currentUser = firebaseAuth.currentUser!!.uid
         // firestore
-        messagesReference = FirebaseFirestore.getInstance().collection(Constants.CHATS);
+        messagesReference = FirebaseFirestore.getInstance().collection(Constants.CHATS)
         roomReferences = FirebaseFirestore.getInstance().collection(Constants.CHATS)
         usersReference = FirebaseFirestore.getInstance().collection(Constants.USERS)
         //firebase real time
-        randomReference = FirebaseDatabase.getInstance().getReference(Constants.CHATS);
+        randomReference = FirebaseDatabase.getInstance().getReference(Constants.CHATS)
 
     }
 
@@ -111,16 +113,14 @@ class ChatsActivity : AppCompatActivity() {
         val newRoom = Room.createRoom()
 
         val pushId: String = randomReference.push().key.toString()
-        val conversationId: String = randomReference.push().key.toString()
         val time: String = System.currentTimeMillis().toString()
         val text: String = newMessageEditText.text.toString()
         val fromUser: String = firebaseAuth.currentUser!!.uid
         val toUser: String = mUid
 
-
         newMessage.objectId = pushId
         newMessage.photo = ""
-        newMessage.conversationId = conversationId
+        newMessage.conversationId = mConversationId
         newMessage.text = text
         newMessage.time = time
         newMessage.seen
@@ -133,23 +133,29 @@ class ChatsActivity : AppCompatActivity() {
         newRoom.isSeen = false
         newRoom.time = time
         newRoom.messageId = pushId
-        newRoom.conversationId = conversationId
+        newRoom.conversationId = mConversationId
 
-        messagesReference.document(fromUser)
-                .collection(conversationId).document(pushId)
-        messagesReference.document(toUser)
-                .collection(conversationId).document(pushId)
+        var senderReference = messagesReference.document(fromUser)
+                .collection(mConversationId).document(pushId)
+        var receiverReference = messagesReference.document(toUser)
+                .collection(mConversationId).document(pushId)
 
-        roomReferences.document(toUser)
+        var senderConversationReference =  roomReferences.document(toUser)
                 .collection("conversations").document(fromUser)
-        roomReferences.document(fromUser)
+        var receiveConversationReference = roomReferences.document(fromUser)
                 .collection("conversations").document(toUser)
+
+        senderReference.set(newMessage)
+        receiverReference.set(newMessage)
+        senderConversationReference.set(newRoom)
+        receiveConversationReference.set(newRoom)
 
         newMessageEditText.setText("")
     }
 
     fun getChatMessages() {
-       listenerRegistration = messagesReference.document(currentUser).collection(mConversationId)
+       messagesReference.document(firebaseAuth.currentUser!!.uid)
+               .collection(mConversationId)
                 .addSnapshotListener(EventListener { documentSnapshots, e ->
 
                     if (e != null){
@@ -168,23 +174,17 @@ class ChatsActivity : AppCompatActivity() {
 
     }
 
-    private fun setRecyclerView(){
-        mChatsAdapter = ChatsAdapter(chats, this)
+    private fun setUpAdapter() {
+        var query: Query = messagesReference.document(firebaseAuth.currentUser!!.uid)
+                .collection(mConversationId).orderBy("time", Query.Direction.ASCENDING)
+        var options: FirestoreRecyclerOptions<Message> = FirestoreRecyclerOptions.Builder<Message>()
+                .setQuery(query, Message::class.java)
+                .build()
+
+        mChatsAdapter = ChatsAdapter(this, options)
         mLinearLayoutManager = LinearLayoutManager(this)
         chatsRecyclerView.layoutManager = mLinearLayoutManager
         chatsRecyclerView.adapter = mChatsAdapter
-        mChatsAdapter.notifyDataSetChanged()
     }
 
-    private fun onDocumentAdded(change: DocumentChange) {
-
-    }
-
-    private fun onDocumentModified(change: DocumentChange) {
-
-    }
-
-    private fun onDocumentRemoved(change: DocumentChange) {
-
-    }
 }

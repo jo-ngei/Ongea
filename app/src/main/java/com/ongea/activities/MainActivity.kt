@@ -16,14 +16,12 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var mainPagerAdapter: MainPagerAdapter
-    private var USER_ID = "user id"
 
+    private var tabIcons = listOf<Int>(R.drawable.ic_chats, R.drawable.ic_people, R.drawable.ic_user_white)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        ButterKnife.bind(this)
-        setSupportActionBar(toolbar)
 
         firebaseAuth = FirebaseAuth.getInstance()
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager);
@@ -33,31 +31,14 @@ class MainActivity : AppCompatActivity() {
         viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
         tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(viewPager))
 
+        setUpTabIcons()
+
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        return super.onPrepareOptionsMenu(menu)
-    }
+    private fun setUpTabIcons(){
+        tabs.getTabAt(0)!!.setIcon(tabIcons[0])
+        tabs.getTabAt(1)!!.setIcon(tabIcons[1])
+        tabs.getTabAt(2)!!.setIcon(tabIcons[2])
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_main, menu);
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val id = item?.itemId;
-
-        if (id == R.id.action_people){
-            val intent = Intent(this, PeopleActivity::class.java);
-            startActivity(intent)
-        }
-
-        if (id == R.id.action_profile){
-            val intent = Intent(this, ProfileActivity::class.java);
-            intent.putExtra(this.USER_ID, firebaseAuth.currentUser!!.uid)
-            startActivity(intent)
-        }
-        return super.onOptionsItemSelected(item)
     }
 }
